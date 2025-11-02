@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.salary.calculator.mapper.WorkSessionMapper">
+    
+    <select id="findByUserIdAndMonth" resultType="com.salary.calculator.entity.WorkSession">
+        SELECT * FROM work_sessions 
+        WHERE user_id = #{userId} 
+        AND EXTRACT(YEAR FROM work_date) = #{year}
+        AND EXTRACT(MONTH FROM work_date) = #{month}
+        ORDER BY work_date, start_time
+    </select>
+    
+    <select id="findByUserIdAndDateRange" resultType="com.salary.calculator.entity.WorkSession">
+        SELECT * FROM work_sessions 
+        WHERE user_id = #{userId} 
+        AND work_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY work_date, start_time
+    </select>
+    
+    <select id="findById" resultType="com.salary.calculator.entity.WorkSession">
+        SELECT * FROM work_sessions WHERE id = #{id}
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO work_sessions (user_id, work_date, start_time, end_time, salary_type_id, created_at, created_by, updated_at, updated_by)
+        VALUES (#{userId}, #{workDate}, #{startTime}, #{endTime}, #{salaryTypeId}, CURRENT_TIMESTAMP, #{createdBy}, CURRENT_TIMESTAMP, #{updatedBy})
+    </insert>
+    
+    <update id="update">
+        UPDATE work_sessions 
+        SET work_date = #{workDate},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            salary_type_id = #{salaryTypeId},
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="delete">
+        DELETE FROM work_sessions WHERE id = #{id}
+    </delete>
+    
+    <select id="findOverlappingSessions" resultType="com.salary.calculator.entity.WorkSession">
+        SELECT * FROM work_sessions 
+        WHERE user_id = #{userId} 
+        AND work_date = #{workDate}
+        AND (
+            (start_time &lt; #{endTime}::time AND end_time &gt; #{startTime}::time)
+        )
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+    
+    <select id="getSummary" resultType="java.util.HashMap">
+        SELECT 
+            COUNT(DISTINCT work_date) as work_days,
+            SUM(EXTRACT(EPOCH FROM (end_time - start_time)) / 3600) as total_hours,
+            SUM(EXTRACT(EPOCH FROM (end_time - start_time)) / 3600 * st.hourly_rate) as total_salary
+        FROM work_sessions ws
+        JOIN salary_types st ON ws.salary_type_id = st.id
+        WHERE ws.user_id = #{userId}
+        AND ws.work_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+    
+</mapper>

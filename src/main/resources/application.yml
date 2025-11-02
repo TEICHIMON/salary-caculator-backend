@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: salary-calculator
+  datasource:
+    url: jdbc:postgresql://localhost:5432/salary_db
+    username: salary_user
+    password: salary_pass
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+jwt:
+  secret: your-secret-key-change-this-in-production-minimum-256-bits
+  expiration: 86400000
+
+server:
+  port: 8080
