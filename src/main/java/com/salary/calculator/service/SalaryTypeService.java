@@ -5,10 +5,12 @@ import com.salary.calculator.entity.SalaryType;
 import com.salary.calculator.mapper.SalaryTypeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class SalaryTypeService {
     
     @Autowired
