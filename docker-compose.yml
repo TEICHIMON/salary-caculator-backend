@@ -35,7 +35,7 @@ services:
 
   frontend:
     build:
-      context: ../salary-calculator-frontend
+      context: ../salary-caculator-frontend
       dockerfile: Dockerfile
     container_name: salary_frontend
     ports:
