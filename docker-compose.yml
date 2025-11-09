@@ -39,6 +39,8 @@ services:
     build:
       context: ../salary-caculator-frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
     container_name: salary_frontend
     restart: unless-stopped
     ports:
